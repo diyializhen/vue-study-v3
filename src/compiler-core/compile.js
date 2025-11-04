@@ -3,5 +3,4 @@ import { isString } from '../shared/shared.js'
 
 export function baseCompile(source) {
   const ast = isString(source) ? baseParse(source) : source
-  console.log(ast)
 }
