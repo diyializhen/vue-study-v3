@@ -417,7 +417,7 @@ export function createRenderer(options) {
             }
           }
           if (newIndex === undefined) {
-            // 当前旧节点oldVNode在新节点中没找到直接卸载
+            // 当前旧节点oldVNode在新节点中没找到复用节点，直接卸载
             unmount(oldVNode)
           } else {
             newVNode = newChildren[newIndex]
@@ -438,35 +438,27 @@ export function createRenderer(options) {
           unmount(oldVNode)
         }
       }
-      if (moved) {
-        // 如果需要移动节点。前面已经把不能复用的旧节点全部卸载了。
-        // 计算最长递增子序列，代表计算出的这些新节点的顺序和对应的旧节点顺序一致，不需要移动。最长递增子序列即选出尽可能多的不需要移动的节点，减少性能消耗。
-        // 此算法返回的是数组source最长递增子序列对应的下标
-        const seq = getSequence(source)
-        let s = seq.length - 1 // 索引s指向最长递增子序列seq数组的末尾下标
-        let i = count - 1 // 索引i指向source数组的末尾下标
-        for(i; i >= 0; i--) {
-          if (source[i] === -1) {
-            // 此新节点没有可复用节点，挂载。i + newStart是新节点在newChildren的实际下标。
-            const pos = i + newStart
-            const newVNode = newChildren[pos]
-            // 以下一个新节点为锚点
-            const nextPos = pos + 1
-            const anchor = nextPos < newChildren.length
-              ? newChildren[nextPos].el
-              : null
-            // 挂载
-            patch(null, newVNode, container, anchor, parentComponent)
-          } else if (i !== seq[s]) {
+      // 如果需要移动节点
+      // 计算最长递增子序列，代表计算出的这些新节点的顺序和对应的旧节点顺序一致，不需要移动。最长递增子序列即选出尽可能多的不需要移动的节点，减少性能消耗。
+      // 此算法返回的是数组source最长递增子序列对应的下标
+      const seq = moved ? getSequence(source) : []
+      let s = seq.length - 1 // 索引s指向最长递增子序列seq数组的末尾下标
+      let i = count - 1 // 索引i指向source数组的末尾下标
+      for(i; i >= 0; i--) {
+        // i + newStart是新节点在newChildren的实际下标
+        const pos = i + newStart
+        const newVNode = newChildren[pos]
+        // 以下一个新节点为锚点
+        const nextPos = pos + 1
+        const anchor = nextPos < newChildren.length
+            ? newChildren[nextPos].el
+            : null
+        if (source[i] === -1) {
+          // 此新节点没有可复用节点，挂载。
+          patch(null, newVNode, container, anchor, parentComponent)
+        } else if (moved) {
+          if (s < 0 || i !== seq[s]) {
             // 如果不相等，则i对应的新节点位置不对，需要移动
-            const pos = i + newStart
-            const newVNode = newChildren[pos]
-            // 以下一个新节点为锚点
-            const nextPos = pos + 1
-            const anchor = nextPos < newChildren.length
-              ? newChildren[nextPos].el
-              : null
-            // 移动
             insert(newVNode.el, container, anchor)
           } else {
             // 如果i === seq[s]，说明i这个位置的新节点位置和最长递增子序列的位置一样，不需要移动
