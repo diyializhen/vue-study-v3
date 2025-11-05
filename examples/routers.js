@@ -4,6 +4,7 @@ import Compiler from "./components/compiler.js"
 import ReactivityData from "./components/ReactivityData.js"
 import WatchTest from "./components/WatchTest.js"
 import ComputedTest from "./components/ComputedTest.js"
+import NextTickTest from "./components/NextTickTest.js"
 
 // 路由
 export default [
@@ -29,13 +30,19 @@ export default [
     path: '/WatchTest',
     name: 'WatchTest',
     component: WatchTest,
-    meta: { title: 'watch' }
+    meta: { title: 'watch测试' }
   },
   {
     path: '/ComputedTest',
     name: 'ComputedTest',
     component: ComputedTest,
-    meta: { title: 'computed' }
+    meta: { title: 'computed测试' }
+  },
+  {
+    path: '/NextTickTest',
+    name: 'NextTickTest',
+    component: NextTickTest,
+    meta: { title: 'nextTick测试' }
   },
   {
     path: '/Compiler',

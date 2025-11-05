@@ -31,7 +31,10 @@ export function createRenderer(options) {
   } = options
   // n1: 旧vnode，n2：新vnode，container：容器元素
   function patch(n1, n2, container, anchor, parentComponent) {
-    if (n1 && n1.type !== n2.type) {
+    if (n1 === n2) {
+      return
+    }
+    if (n1 && !isSameVNodeType(n1, n2)) {
       // 如果新旧 vnode 的类型不同，则直接将旧 vnode 卸载
       unmount(n1)
       n1 = null
