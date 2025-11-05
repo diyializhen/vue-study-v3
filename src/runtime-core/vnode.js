@@ -1,6 +1,7 @@
-import { isObject, isString, isArray } from "../shared/shared.js"
+import { isObject, isString, isArray, isFunction } from "../shared/shared.js"
 import { normalizeClass, normalizeStyle } from "../shared/normalizeProp.js"
 import { isProxy } from "../reactivity/index.js"
+import { getCurrentInstance } from "./components.js"
 
 // 定义节点的type类型
 export const Text = Symbol()
@@ -37,7 +38,30 @@ export function createVNode(type, props, children) {
     // key非null非undefined时，存key，否则就是null
     key: props && (props.key != null ? props.key : null),
   }
+  if (children) {
+    normalizeChildren(vnode, children)
+  }
   return vnode
+}
+
+function normalizeChildren(vnode, children) {
+  let type = ''
+  if (children == null) {
+    children = null
+  } else if (isArray(children)) {
+    type = 'ARRAY_CHILDREN'
+  } else if (typeof children === 'object') {
+    const slot = children.default
+    if (slot) {
+      normalizeChildren(vnode, slot)
+      return
+    }
+  } else if (isFunction(children)) {
+    children = { default: children, _ctx: getCurrentInstance() }
+  } else {
+    children = String(children)
+  }
+  vnode.children = children
 }
 
 export function createTextVNode(text) {
