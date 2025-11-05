@@ -2,6 +2,8 @@ import Introduction from "./components/Introduction.js"
 import LifeCycle from "./components/LifeCycle.js"
 import Compiler from "./components/compiler.js"
 import ReactivityData from "./components/ReactivityData.js"
+import WatchTest from "./components/WatchTest.js"
+import ComputedTest from "./components/ComputedTest.js"
 
 // 路由
 export default [
@@ -22,6 +24,18 @@ export default [
     name: 'ReactivityData',
     component: ReactivityData,
     meta: { title: '响应式数据' }
+  },
+  {
+    path: '/WatchTest',
+    name: 'WatchTest',
+    component: WatchTest,
+    meta: { title: 'watch' }
+  },
+  {
+    path: '/ComputedTest',
+    name: 'ComputedTest',
+    component: ComputedTest,
+    meta: { title: 'computed' }
   },
   {
     path: '/Compiler',
