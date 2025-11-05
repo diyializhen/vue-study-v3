@@ -2,7 +2,7 @@ import { effect } from "./effect.js"
 import { isRef } from "./ref.js"
 import { isObject, isArray, isMap, isSet, isPlainObject } from "../shared/shared.js"
 
-export function watch(source, cb, options = {}) {
+export function watch(source, cb = null, options = {}) {
   let getter
   // watch可以观测getter函数或响应式数据
   if (typeof source === 'function') {
@@ -23,7 +23,9 @@ export function watch(source, cb, options = {}) {
     if (cleanup) {
       cleanup()
     }
-    cb(newValue, oldValue, onInvalidate)
+    if (cb) {
+      cb(newValue, oldValue, onInvalidate)
+    }
     // 更新旧值
     oldValue = newValue
   }
@@ -43,13 +45,17 @@ export function watch(source, cb, options = {}) {
       }
     }
   )
-  if (options.immediate) {
+  if (cb && options.immediate) {
     // 当 immediate 为 true 时立即执行 job，从而触发cb回调执行
     job()
   } else {
     // 手动调用副作用函数，拿到旧值
     oldValue = effectFn()
   }
+}
+
+export function watchEffect(effect, options = {}) {
+  return watch(effect, null, options)
 }
 
 // 递归遍历读取对象，收集所有依赖数据，从而可监听任意属性变化

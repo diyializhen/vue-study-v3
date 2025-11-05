@@ -1,5 +1,5 @@
 export { effect } from './effect.js'
 export { computed } from './computed.js'
-export { watch } from './watch.js'
+export { watch, watchEffect } from './watch.js'
 export { reactive, readonly, shallowReadonly, shallowReactive, isProxy } from './reactive.js'
 export { ref, shallowRef, isRef, toRef, toRefs, proxyRefs } from './ref.js'
