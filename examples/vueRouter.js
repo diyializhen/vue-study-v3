@@ -32,14 +32,16 @@ export const RouterView = {
 
 export const RouterLink = {
   name: 'RouterLink',
-  setup(props, { slots }) {
+  setup(props, { slots, emit }) {
     const onLinkClick = () => {
       location.hash = props.to
+      emit('click', props.to)
     }
     return () => {
+      const { onClick, ...restProp } = props
       return h('a', {
         onClick: onLinkClick,
-        ...props
+        ...restProp
       }, slots.default())
     }
   }

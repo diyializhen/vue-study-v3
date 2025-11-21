@@ -7,6 +7,10 @@ import routers from './routers.js'
 const App = {
   name: 'App',
   setup() {
+    const onLinkClick = (to) => {
+      console.log(`----------路由切换：${to}----------`)
+    }
+
     return () => {
       // 遍历路由列表，生成连接标签
       const links = routers.map(item => {
@@ -14,7 +18,11 @@ const App = {
           'div',
           h(
             RouterLink,
-            { to: item.path, class: 'el-link el-link--primary' },
+            {
+              to: item.path,
+              class: 'el-link el-link--primary',
+              onClick: onLinkClick
+            },
             { default: () => item.meta.title }
           )
         )

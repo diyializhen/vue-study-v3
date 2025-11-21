@@ -9,7 +9,7 @@ export default {
       isShow.value = !isShow.value
       console.log(document.querySelector('#next-tick-test'))
       nextTick(() => {
-        console.log('nextTick')
+        console.log('nextTick获取DOM元素：')
         console.log(document.querySelector('#next-tick-test'))
       })
     }

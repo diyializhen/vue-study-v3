@@ -5,6 +5,7 @@ import ReactivityData from "./components/ReactivityData.js"
 import WatchTest from "./components/WatchTest.js"
 import ComputedTest from "./components/ComputedTest.js"
 import NextTickTest from "./components/NextTickTest.js"
+import TeleportTest from "./components/TeleportTest.js"
 
 // 路由
 export default [
@@ -43,6 +44,12 @@ export default [
     name: 'NextTickTest',
     component: NextTickTest,
     meta: { title: 'nextTick测试' }
+  },
+  {
+    path: '/TeleportTest',
+    name: 'TeleportTest',
+    component: TeleportTest,
+    meta: { title: 'Teleport测试' }
   },
   {
     path: '/Compiler',
