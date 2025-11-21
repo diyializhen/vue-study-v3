@@ -141,14 +141,11 @@ export function createRenderer(options) {
   }
 
   // 卸载
-  function unmount(vnode) {
-    // vnode上有transition属性，代表是Transition组件的子元素，需要过渡
-    const needTransition = vnode.transition
-    // 在卸载时，如果卸载的 vnode 类型为 Fragment，则需要卸载其 children
-    if (vnode.type === Fragment) { 
-      vnode.children.forEach(c => unmount(c))
-    } else if (isObject(vnode.type) || isFunction(vnode.type)) {
-      // 卸载组件
+  function unmount(vnode, doRemove = true) {
+    const isTeleport = isObject(vnode.type) && vnode.type.__isTeleport
+    const isComponent = isObject(vnode.type) || isFunction(vnode.type)
+    if (isComponent && !isTeleport) {
+      // 卸载组件, Teleport内置组件不需要卸载
       const instance = vnode.component
       if (vnode.shouldKeepAlive) {
         // 需要keepAlive的组件，不要卸载，调用keepAlive组件上挂的_deActivate方法移动到一个隐藏容器
@@ -156,24 +153,47 @@ export function createRenderer(options) {
       } else {
         const { beforeUnmount, unmounted } = instance
         callHook(beforeUnmount, instance)
-        unmount(instance.subTree)
+        unmount(instance.subTree, doRemove)
         callHook(unmounted, instance)
         instance.isUnmounted = true
       }
     } else {
-      // mountElement挂载时存了el，通过vnode.el获取真实DOM元素
-      const parent = vnode.el.parentNode
-      if (parent) {
-        // 将卸载元素封装一下
-        const performRemove = () => parent.removeChild(vnode.el)
-        if (needTransition) {
-          // 需要过渡的情况，调用transition.leave钩子
-          vnode.transition.leave(vnode.el, performRemove)
-        } else {
-          // 不需要过渡直接卸载
-          performRemove()
-        }
+      if (isTeleport) {
+        vnode.type.remove(vnode, { unmount })
+      } else if (vnode.type === Fragment || isArray(vnode.children)) {
+        // 在卸载时，如果卸载的 vnode 类型为 Fragment，或有children的节点，则需要卸载其 children
+        // 这里递归unmount子节点，doRemove默认false不删除，只为了卸载子组件
+        unmountChildren(vnode.children)
       }
+      if (doRemove) {
+        // 删除节点
+        removeByVnode(vnode)
+      }
+    }
+  }
+
+  function removeByVnode(vnode) {
+    // vnode上有transition属性，代表是Transition组件的子元素，需要过渡
+    // mountElement挂载时存了el，通过vnode.el获取真实DOM元素
+    const { type, el, transition } = vnode
+    if (type === Fragment) {
+      unmountChildren(vnode.children, true)
+      return
+    }
+    // 将卸载元素封装一下
+    const performRemove = () => remove(el)
+    if (transition) {
+      // 需要过渡的情况，调用transition.leave钩子
+      transition.leave(el, performRemove)
+    } else {
+      // 不需要过渡直接卸载
+      performRemove()
+    }
+  }
+
+  function unmountChildren(children, doRemove = false, start = 0) {
+    for (let i = start; i < children.length; i++) {
+      unmount(children[i], doRemove)
     }
   }
 
@@ -388,7 +408,7 @@ export function createRenderer(options) {
       // 相当于数组的下标可以通过newStart + i 获得剩余newVnode的下标，下标对应的值是oldVnode的下标
       const count = newEnd - j + 1
       const source = new Array(count)
-      source.fill(-1)
+      source.fill(-1) // vue 源码里默认值用的0，实际存的下标偏移一下为i+1。和这里默认值-1，存的下标是i一个意思，后面只是
       const oldStart = j
       const newStart = j
       let moved = false // 是否需要移动

@@ -1,4 +1,4 @@
-import { isString } from "../../shared/shared.js"
+import { isString, isArray } from "../../shared/shared.js"
 import { Text, Fragment} from '../vnode.js'
 
 /*
@@ -31,6 +31,7 @@ export const Teleport = {
       const target = isString(n2.props.to)
         ? querySelector(n2.props.to)
         : n2.props.to
+      n2.target = target
       // 将新vnode n2的children挂载到target中
       n2.children.forEach(c => patch(null, c, target, anchor, parentComponent))
     } else {
@@ -42,8 +43,22 @@ export const Teleport = {
         const newTarget = isString(n2.props.to)
           ? querySelector(n2.props.to)
           : n2.props.to
+        n2.target = newTarget
         // 移动
         n2.children.forEach(c => move(c, newTarget, null, internals))
+      }
+    }
+  },
+  // 卸载时调用
+  remove(vnode, internals,) {
+    const { children } = vnode
+    const { unmount } = internals
+    if (isArray(children)) {
+      const shouldRemove = true
+      for (let i = 0; i < children.length; i++) {
+        const child = children[i]
+        // 递归调用卸载子节点
+        unmount(child, shouldRemove)
       }
     }
   }

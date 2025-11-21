@@ -155,10 +155,10 @@ export function setupComponent(instance) {
 function resolveProps(options = {}, propsData = {}) {
   const attrs = {}
   // 正常应该校验：
-  // 如果传给组件的props数据在组件自身的props选项中有定义，则视为合法的props
+  // 如果传给组件的props数据在组件自身的props选项中有定义，则视为合法的props，其他的才是attrs
   // 以on开头的属性，直接添加到props中，而不是attrs
-  // 目前不做处理，直接返回propsData
-  return [propsData, attrs]
+  // 目前不做这个处理，直接返回propsData
+  return [propsData, { ...propsData }]
 }
 
 const publicPropertiesMap = {
