@@ -64,6 +64,19 @@ function normalizeChildren(vnode, children) {
   vnode.children = children
 }
 
+// 规范vnode
+export function normalizeVNode(child) {
+  if (child == null || typeof child === 'boolean') {
+    return createVNode(Comment)
+  } else if (isArray(child)) {
+    return createVNode(Fragment, null, child.slice())
+  } else if (isVNode(child)) {
+    return child
+  } else {
+    return createVNode(Text, null, String(child))
+  }
+}
+
 export function createTextVNode(text) {
   return createVNode(Text, {}, text)
 }

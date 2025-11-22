@@ -2,7 +2,7 @@ import { isArray, isFunction, isString, isObject } from "../shared/shared.js"
 import { effect } from '../reactivity/index.js'
 import { queueJob } from './scheduler.js'
 import { createComponentInstance, setupComponent, callHook } from './components.js'
-import { Text, Comment, Fragment } from "./vnode.js"
+import { Text, Comment, Fragment, normalizeVNode } from "./vnode.js"
 import { createAppAPI } from './createApp.js'
 
 /*
@@ -22,6 +22,7 @@ export function createRenderer(options) {
   const {
     insert,
     remove,
+    createComment,
     createElement,
     setElementText,
     createText,
@@ -119,7 +120,7 @@ export function createRenderer(options) {
       // 如果 children 是数组，则遍历每一个子节点，并调用 patch 函数挂载
       vnode.children.forEach(child => {
         // 挂载阶段，没有旧vnode
-        patch(null, child, el)
+        patch(null, normalizeVNode(child), el)
       })
     }
     if (vnode.props) {
@@ -280,7 +281,7 @@ export function createRenderer(options) {
     const componentUpdateFn = () => {
       const { render, mounted, beforeMount, beforeUpdate, updated } = instance
       // 每次副作用函数执行，执行渲染函数，返回一个新的虚拟DOM
-      const subTree = render.call(instance.proxy, instance.proxy)
+      const subTree = normalizeVNode(render.call(instance.proxy, instance.proxy))
       if (!instance.isMounted) {
         // 初次挂载，patch第一个参数旧vnode传null
         callHook(beforeMount, instance)

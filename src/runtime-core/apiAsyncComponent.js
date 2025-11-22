@@ -2,6 +2,7 @@ import { ref, shallowRef } from '../reactivity/index.js'
 import { isFunction } from '../shared/shared.js'
 import { onUnmounted} from './components.js'
 import { Text } from './vnode.js'
+import { h } from './vnode.js'
 
 // 异步组件
 export function defineAsyncComponent(options) {
@@ -70,28 +71,24 @@ export function defineAsyncComponent(options) {
       if (options.timeout) {
         timer = setTimeout(() => {
           // 超时后创建一个错误对象，并复制给 error.value
+          if (loaded.value || error.value) return
           const err = new Error(`Async component timed out after${options.timeout}ms.`)
           error.value = err
         }, options.timeout)
       }
       // 组件被卸载时清除定时器
       onUnmounted(() => clearTimeout(timer))
-      const placeholder = { type: Text, children: '' }
+      const placeholder = h(Text, '')
       return () => {
         if (loaded.value) {
           // 加载成功渲染组件
-          return { type: innerComp }
+          return h(innerComp)
         } else if (error.value && options.errorComponent) {
           // 只有当错误存在且用户配置了 errorComponent 时才展示 Error组件，同时将 error 作为 props 传递
-          return {
-            type: options.errorComponent,
-            props: {
-              error: error.value
-            }
-          }
+          return h(options.errorComponent, { error: error.value })
         } else if (loading.value && options.loadingComponent) {
           // 如果异步组件正在加载，并且配置了loading组件，则渲染loading组件
-          return { type: options.loadingComponent }
+          return h(options.loadingComponent)
         } else {
           return placeholder
         }

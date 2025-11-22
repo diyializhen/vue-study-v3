@@ -1,5 +1,5 @@
-import { getCurrentInstance, injectHook, onUnmounted } from '../components.js'
-import { isObject } from '../../shared/shared.js'
+import { getCurrentInstance, injectHook, callHook, onUnmounted } from '../components.js'
+import { isObject, isArray, isString } from '../../shared/shared.js'
 
 /* 
 简述：
@@ -26,15 +26,20 @@ export const KeepAlive = {
     const instance = getCurrentInstance()
     // 在渲染器 mountComponent 挂载组件时给KeepAlive组件的实例上注入一个keepAliveCtx对象，该对象暴漏渲染器内部的一些方法。在已被keptAlive的组件再次挂载时，直接调用_activate，需要keepAlive的组件被卸载时调用_deActivate。
     // move是将一段DOM移动到另一个容器中
-    const { move, createElement } = instance.keepAliveCtx
+    const { move, createElement } = instance.KeepAliveCtx
     // 创建一个隐藏容器
     const storageContainer = createElement('div')
-    // 给组件实例上添加两个内部函数_deActivate和_activate用于移动节点，他们会在渲染器patch和unmount中被调用
+    // 给KeepAlive组件实例上添加两个内部函数_deActivate和_activate用于移动节点，他们会在渲染器patch和unmount中被调用
     instance._deActivate = (vnode) => {
       move(vnode, storageContainer)
+      // 执行生命周期
+      const { deactivated } = vnode.component
+      callHook(deactivated, vnode.component)
     }
     instance._activate = (vnode, container, anchor) => {
       move(vnode, container, anchor)
+      const { activated } = vnode.component
+      callHook(activated, vnode.component)
     }
 
     return () => {
@@ -81,9 +86,9 @@ export const KeepAlive = {
         // 如果没有缓存，则将其添加到缓存中，这样下次激活组件时就不会执行新的挂载动作了
         cache.set(key, rawVNode)
       }
-      // 在vnode上添加shouldKeepAlive属性，避免渲染器unmount时将组件卸载，而是失活组件
+      // 在vnode上添加shouldKeepAlive属性标记，避免渲染器unmount时将组件卸载，而是失活组件
       rawVNode.shouldKeepAlive = true
-      // 将 KeepAlive 组件的实例也添加到被缓存的 vnode 上，以便在渲染器中通过实例访问_deActivate，_activate
+      // 将 KeepAlive 组件的实例添加到被缓存的 vnode 上，以便在渲染器中通过实例访问_deActivate，_activate
       rawVNode.keepAliveInstance = instance
       // render函数返回被keepAlive的组件
       return rawVNode
