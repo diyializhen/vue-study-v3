@@ -17,7 +17,7 @@ export default {
       return h('div', [
         h('h2', 'nextTick测试'),
         h('button', { onClick: toggle }, '点击切换'),
-        h('div', isShow.value ? h('div', { id: 'next-tick-test' }, 'xxxxxx') : [])
+        h('div', isShow.value ? h('div', { id: 'next-tick-test' }, 'xxxxxx') : null)
       ])
     }
   }

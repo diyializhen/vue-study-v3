@@ -6,6 +6,9 @@ import WatchTest from "./components/WatchTest.js"
 import ComputedTest from "./components/ComputedTest.js"
 import NextTickTest from "./components/NextTickTest.js"
 import TeleportTest from "./components/TeleportTest.js"
+import KeepAliveTest from "./components/KeepAliveTest.js"
+import TransitionTest from "./components/TransitionTest.js"
+import AsyncComponentTest from "./components/AsyncComponentTest.js"
 
 // 路由
 export default [
@@ -50,6 +53,24 @@ export default [
     name: 'TeleportTest',
     component: TeleportTest,
     meta: { title: 'Teleport测试' }
+  },
+  {
+    path: '/KeepAliveTest',
+    name: 'KeepAliveTest',
+    component: KeepAliveTest,
+    meta: { title: 'KeepAlive测试' }
+  },
+  {
+    path: '/TransitionTest',
+    name: 'TransitionTest',
+    component: TransitionTest,
+    meta: { title: 'Transition测试' }
+  },
+  {
+    path: '/AsyncComponentTest',
+    name: 'AsyncComponentTest',
+    component: AsyncComponentTest,
+    meta: { title: 'defineAsyncComponent测试' }
   },
   {
     path: '/Compiler',
