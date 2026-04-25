@@ -22,7 +22,7 @@
 - **应用实例**：
   - createApp()
   - app.mount()、app.unmount()
-- **组件**：
+- **组件渲染**：
   - props、事件、插槽、setup、render函数、h函数等
 - **模板编译**：
   - 模板字符串 -> 模板AST
@@ -31,7 +31,7 @@
 ```
 examples/           # 功能简单展示示例
   components/       # 示例组件
-  index.html        # 示例html
+  index.html        # 示例入口文件
   main.js           # 示例入口文件
   router.js         # 示例路由配置
   vueRouter.js      # vue router 简单实现，便于展示实例
@@ -42,6 +42,8 @@ src/
   runtime-dom/      # DOM运行时（DOM操作方法、属性更新、样式更新）
   shared/           # 工具函数
 README.md           # 项目介绍
+package.json        # node配置文件
+vite.config.js      # vite配置文件
 ```
 
 ## 参考
@@ -49,4 +51,5 @@ README.md           # 项目介绍
 - 《Vue.js设计与实现》（霍春阳）
 
 ## 快速展示
-启动本地服务，在浏览器直接打开`examples/index.html`，即可以做简单的功能展示。
+使用 `pnpm install` 或 `npm install` 安装依赖。
+使用 `npm run dev` 启动本地服务，打开功能展示页面。
