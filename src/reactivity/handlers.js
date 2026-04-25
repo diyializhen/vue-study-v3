@@ -229,7 +229,7 @@ const arrayInstrumentations = {}
   const originMethod = Array.prototype[method]
   arrayInstrumentations[method] = function(...args) {
     // this为代理对象，先在代理对象中查找，将结果存储到 res 中
-    const res = originMethod.apply(this, args)
+    let res = originMethod.apply(this, args)
     if (res === false || res === -1) {
       // res 为 false 说明没找到，通过 this[RAW] 拿到原始数组，再去其中查找并更新 res 值
       res = originMethod.apply(this[RAW], args)
